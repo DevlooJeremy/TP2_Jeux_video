@@ -48,12 +48,12 @@ void SceneTitle::getInputs()
 	{
 		//x sur la fenêtre
 		if (event.type == Event::Closed) exitGame();
+
+		if (event.type == Event::KeyPressed && event.key.scancode == Keyboard::Scan::Enter) startGame();
 	}
 }
 
-void SceneTitle::update()
-{
-}
+void SceneTitle::update(){}
 
 void SceneTitle::draw()
 {
@@ -66,4 +66,9 @@ void SceneTitle::draw()
 bool SceneTitle::unload()
 {
 	return true;
+}
+
+void SceneTitle::startGame() {
+	isRunning = false;
+	transitionToScene = Scene::scenes::TRANSITION;
 }

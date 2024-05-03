@@ -29,10 +29,11 @@ int Game::run()
 	if (!ContentPipeline::getInstance().loadContent()) return EXIT_FAILURE;
 
 	//Un enum et un pointeur de scene pour faire la manipulation de scène
-	Scene::scenes sceneSelector = Scene::scenes::LEVEL1;
+	Scene::scenes sceneSelector = Scene::scenes::TITLE;
 	Scene* activeScene = nullptr; //Pointeur de la super-classe, peut pointer sur n'importe quelle scène
 
 	//Les variables de passage d'information entre scènes devraient être déclarés ici
+	int currentWave = 0;
 
 	while (true)
 	{
@@ -52,7 +53,7 @@ int Game::run()
 			break;
 		case Scene::scenes::TRANSITION:
 			//Les deux attributs sont récessaire et passés par référence
-			activeScene = new SceneTransition(renderWindow, event);
+			activeScene = new SceneTransition(renderWindow, event, currentWave);
 			break;
 		case Scene::scenes::LEVEL1:
 			//Les deux attributs sont récessaire et passés par référence
@@ -69,6 +70,12 @@ int Game::run()
 			//À la fin de cette méthode, elle retourne la scène
 			//Laquelle on transition
 			sceneSelector = activeScene->run();
+
+			SceneTitle* tempScene = dynamic_cast<SceneTitle*>(activeScene);
+			if (tempScene != nullptr)//Donc si le cast a réussi.
+			{
+				currentWave++;
+			}
 
 			//À la fin d'une scène, s'il y a des sauvegardes à faire
 			//C'est possible de les faire là.

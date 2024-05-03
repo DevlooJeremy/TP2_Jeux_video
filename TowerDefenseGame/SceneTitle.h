@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "Inputs.h"
 
 using namespace sf;
 
@@ -16,7 +17,11 @@ private:
 	void draw() override;
 	bool unload() override;
 
+	void startGame();
+
 	View view;
+
+	Inputs inputs;
 
 	Sprite titleScreen;
 	Text instructions;
