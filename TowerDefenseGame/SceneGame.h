@@ -4,6 +4,8 @@
 #include "Inputs.h"
 #include "TowerEmplacement.h"
 #include "Tower.h"
+#include "Waypoint.h"
+#include "Demon.h"
 
 /*
 Metrics de sceneGame OU du level 1 (à effacer à la fin)
@@ -43,12 +45,25 @@ private:
 	void update() override;
 	void draw() override;
 	bool unload() override;
+	void setupWaypoints();
+	void manageDemon();
+	void spawnDemon();
 
 	void initTowers();
 
 	View view;
 	Hud hud;
 	Inputs inputs;
+
+	enum Instruction {ARCHER_TOWER, MAGE_TOWER, PLAGUE, SACRED_LIGHT};
+
+	const int NBR_WAYPOINTS = 11;
+	Waypoint waypoints[11];
+
+	const int NBR_DEMON = 20;
+	Demon demons[20];
+	float spawnTimer = 0.0f;
+
 
 	Sprite map;
 
