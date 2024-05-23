@@ -7,7 +7,10 @@ Tower::Tower()
 
 Tower::~Tower()
 {
-	delete[] imagesMageAttack;
+	if (imagesMageAttack != nullptr)
+	{
+		delete[] imagesMageAttack;
+	}
 }
 
 void Tower::init(const int spriteNbr, const Vector2f& position) {

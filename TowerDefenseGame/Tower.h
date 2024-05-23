@@ -36,7 +36,7 @@ private:
 
 	const int MAGE_RECTANGLE_SIZE = 150;
 	const int MAGE_ATTACK_ANIM = 3;
-	IntRect* imagesMageAttack;
+	IntRect* imagesMageAttack = nullptr;
 	void setupMageAnims();
 };
 

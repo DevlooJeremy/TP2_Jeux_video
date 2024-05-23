@@ -56,6 +56,7 @@ private:
 	Inputs inputs;
 
 	enum Instruction {ARCHER_TOWER, MAGE_TOWER, PLAGUE, SACRED_LIGHT};
+	Instruction instruction;
 
 	const int NBR_WAYPOINTS = 11;
 	Waypoint waypoints[11];

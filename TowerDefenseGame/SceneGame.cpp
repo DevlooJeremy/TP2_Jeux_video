@@ -59,14 +59,24 @@ void SceneGame::getInputs()
 
 		if (event.type == Event::KeyPressed)
 		{
+			if (event.key.scancode == Keyboard::Scan::A) //Archer tower
+			{
+				instruction = Instruction::ARCHER_TOWER;
+			}
+
+			if (event.key.scancode == Keyboard::Scan::S) //Mage tower
+			{
+				instruction = Instruction::MAGE_TOWER;
+			}
+
 			if (event.key.scancode == Keyboard::Scan::A) //Plague
 			{
-			
+				instruction = Instruction::PLAGUE;
 			}
 
 			if (event.key.scancode == Keyboard::Scan::S) //Sacred light
 			{
-				
+				instruction = Instruction::SACRED_LIGHT;
 			}
 		}
 	}
