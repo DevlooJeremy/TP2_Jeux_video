@@ -52,5 +52,7 @@ protected:
 	/// </summary>
 	Scene::scenes transitionToScene;
 	bool isRunning = true;
+
+	int currentWave;
 };
 

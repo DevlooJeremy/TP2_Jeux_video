@@ -57,7 +57,7 @@ int Game::run()
 			break;
 		case Scene::scenes::LEVEL1:
 			//Les deux attributs sont récessaire et passés par référence
-			activeScene = new SceneGame(renderWindow, event);
+			activeScene = new SceneGame(renderWindow, event, currentWave);
 			break;
 		case Scene::scenes::END:
 			activeScene = new SceneEnd(renderWindow, event);

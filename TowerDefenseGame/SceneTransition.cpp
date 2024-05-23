@@ -25,7 +25,7 @@ bool SceneTransition::init()
 {
 	if (currentWave == 1)
 	{
-		message.setString("Minons of the Dark Lord march on our lands.\n\n             Defend the King's Tower!\n\n                           Wave 1");
+		message.setString("Minions of the Dark Lord march on our lands.\n\n             Defend the King's Tower!\n\n                           Wave 1");
 		message.setCharacterSize(60);
 	}
 	else {

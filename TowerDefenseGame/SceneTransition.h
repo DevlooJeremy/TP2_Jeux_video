@@ -22,7 +22,6 @@ private:
 	Font font;
 	Text message;
 
-	int currentWave;
 	float displayTime;
 
 	const float MAX_DISPLAY_TIME = 3.0f;

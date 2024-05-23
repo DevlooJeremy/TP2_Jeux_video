@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "Hud.h"
 #include "Inputs.h"
+#include "TowerEmplacement.h"
+#include "Tower.h"
 
 /*
 Metrics de sceneGame OU du level 1 (à effacer à la fin)
@@ -32,7 +34,7 @@ Metrics de du level 2 (à effacer à la fin)
 class SceneGame : public Scene
 {
 public:
-	SceneGame(RenderWindow& renderWindow, Event& event);
+	SceneGame(RenderWindow& renderWindow, Event& event, int currentWave);
 	scenes run() override;
 	bool init() override;
 
@@ -42,9 +44,23 @@ private:
 	void draw() override;
 	bool unload() override;
 
+	void initTowers();
+
 	View view;
 	Hud hud;
 	Inputs inputs;
 
 	Sprite map;
+
+	int mapNbr;
+
+	static const int NBR_MAX_TOWER = 9;
+	int currentMapMaxNbrOfTower;
+	const int KING_TOWER_ARRAY_POSITION = NBR_MAX_TOWER * 2 - 1;
+	const Vector2f KING_TOWER_POSITION_MAP1 = Vector2f(1138, 600);
+	const Vector2f KING_TOWER_POSITION_MAP2 = Vector2f(1138, 564);
+	const Vector2f TOWER_EMPLACEMENTS_MAP1[NBR_MAX_TOWER] = { Vector2f(470, 170), Vector2f(770, 250), Vector2f(440, 370), Vector2f(650, 520), Vector2f(120, 650), Vector2f(470, 700), Vector2f(850, 710), Vector2f(660, 950) };
+	const Vector2f TOWER_EMPLACEMENTS_MAP2[NBR_MAX_TOWER] = { Vector2f(110, 620), Vector2f(228, 320), Vector2f(444, 780), Vector2f(362, 530), Vector2f(610, 222), Vector2f(998, 270), Vector2f(630, 460), Vector2f(935, 520), Vector2f(798, 760) };
+	TowerEmplacement emplacements[NBR_MAX_TOWER];
+	Tower towers[NBR_MAX_TOWER*2];
 };

@@ -34,6 +34,10 @@ public:
 	void move(const Vector2f& offset);
 	void moveBack();
 
+	void setHealth(const float health);
+	int getHealth() const;
+	void damage(const float damageTaken);
+
 	void draw(RenderWindow& renderWindow) const;
 
 protected:
@@ -46,4 +50,6 @@ private:
 	bool active;
 	float rotationRadians;
 	Vector2f backupPosition;
+
+	float health;
 };

@@ -113,3 +113,16 @@ void GameObject::draw(RenderWindow& renderWindow) const
 {
 	if (active) renderWindow.draw(*this);
 }
+
+void GameObject::setHealth(const float health)
+{
+	this->health = health;
+}
+
+int GameObject::getHealth() const{
+	return this->health;
+}
+
+void GameObject::damage(const float damageTaken) {
+	this->health -= damageTaken;
+}
