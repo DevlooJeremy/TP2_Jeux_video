@@ -1,4 +1,5 @@
 #pragma once
+#include "Subject.h"
 
 /*
 Metrics du Spell (à effacer à la fin)
@@ -16,11 +17,16 @@ va de 0 à 20, progressivement en avancant dans le temps
 
 */
 
-class Spell
+class Spell: public Subject
 {
 public:
 	Spell();
+	
 
 private:
+
+	enum SpellType { PLAGUE, SACRED_LIGHT };
+
+	SpellType spellType;
 };
 
