@@ -45,6 +45,11 @@ private:
 	void update() override;
 	void draw() override;
 	bool unload() override;
+
+	void manageLeftClick();
+	void manageArcherPlacement();
+	void manageMagePlacement();
+
 	void setupWaypoints();
 	void manageDemon();
 	void spawnDemon();

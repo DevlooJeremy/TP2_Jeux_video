@@ -57,6 +57,15 @@ void SceneGame::getInputs()
 		//x sur la fenêtre
 		if (event.type == Event::Closed) exitGame();
 
+		if (event.type == Event::MouseButtonPressed)
+		{
+			if (event.mouseButton.button == Mouse::Left)
+			{
+				inputs.mouseLeftButtonClicked = true;
+				inputs.mousePosition = renderWindow.mapPixelToCoords(Mouse::getPosition(renderWindow));
+			}
+		}
+
 		if (event.type == Event::KeyPressed)
 		{
 			if (event.key.scancode == Keyboard::Scan::A) //Plague
@@ -74,6 +83,7 @@ void SceneGame::getInputs()
 
 void SceneGame::update()
 {
+	manageLeftClick();
 	manageDemon();
 }
 
@@ -112,29 +122,41 @@ bool SceneGame::unload()
 	return true;
 }
 
-void SceneGame::initTowers() {
-	if (mapNbr == 1)
+void SceneGame::manageLeftClick() {
+	if (inputs.mouseLeftButtonClicked)
 	{
-		currentMapMaxNbrOfTower = 8;
-		towers[KING_TOWER_ARRAY_POSITION].init(Tower::KING_TOWER_SPRITE_NBR, KING_TOWER_POSITION_MAP1);
-		for (int i = 0; i < currentMapMaxNbrOfTower; i++)
+		switch (instruction)
 		{
-			emplacements[i].init(TOWER_EMPLACEMENTS_MAP1[i]);
-			towers[i].init(Tower::ARCHER_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP1[i]);
-			towers[i + currentMapMaxNbrOfTower].init(Tower::MAGE_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP1[i]);
-		}
-	}
-	else
-	{
-		currentMapMaxNbrOfTower = NBR_MAX_TOWER - 1;
-		for (int i = 0; i < currentMapMaxNbrOfTower; i++)
-		{
-			emplacements[i].init(TOWER_EMPLACEMENTS_MAP2[i]);
-			towers[i].init(1, TOWER_EMPLACEMENTS_MAP2[i]);
-			towers[i + currentMapMaxNbrOfTower].init(2, TOWER_EMPLACEMENTS_MAP2[i]);
+		case ARCHER_TOWER:
+			manageArcherPlacement();
+			break;
+
+		case MAGE_TOWER:
+			manageMagePlacement();
+			break;
+
+		case PLAGUE:
+		
+			break;
+
+		case SACRED_LIGHT:
+		
+			break;
+
+		default:
+			break;
 		}
 	}
 }
+
+void SceneGame::manageArcherPlacement() {
+
+}
+
+void SceneGame::manageMagePlacement() {
+
+}
+
 void SceneGame::setupWaypoints() 
 {
 	waypoints[0].setPosition(610, 8);
@@ -178,6 +200,30 @@ void SceneGame::spawnDemon()
 				break;
 			}
 
+		}
+	}
+}
+
+void SceneGame::initTowers() {
+	if (mapNbr == 1)
+	{
+		currentMapMaxNbrOfTower = 8;
+		towers[KING_TOWER_ARRAY_POSITION].init(Tower::KING_TOWER_SPRITE_NBR, KING_TOWER_POSITION_MAP1);
+		for (int i = 0; i < currentMapMaxNbrOfTower; i++)
+		{
+			emplacements[i].init(TOWER_EMPLACEMENTS_MAP1[i]);
+			towers[i].init(Tower::ARCHER_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP1[i]);
+			towers[i + currentMapMaxNbrOfTower].init(Tower::MAGE_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP1[i]);
+		}
+	}
+	else
+	{
+		currentMapMaxNbrOfTower = NBR_MAX_TOWER - 1;
+		for (int i = 0; i < currentMapMaxNbrOfTower; i++)
+		{
+			emplacements[i].init(TOWER_EMPLACEMENTS_MAP2[i]);
+			towers[i].init(1, TOWER_EMPLACEMENTS_MAP2[i]);
+			towers[i + currentMapMaxNbrOfTower].init(2, TOWER_EMPLACEMENTS_MAP2[i]);
 		}
 	}
 }
