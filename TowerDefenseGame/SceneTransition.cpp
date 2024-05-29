@@ -29,7 +29,7 @@ bool SceneTransition::init()
 		message.setCharacterSize(60);
 	}
 	else {
-		message.setString("Wave " + currentWave);
+		message.setString("Wave " + std::to_string(currentWave));
 		message.setCharacterSize(80);
 	}
 

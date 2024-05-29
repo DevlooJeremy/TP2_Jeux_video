@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "IObserver.h"
 
 /*
 Metrics des tours  (à effacer à la fin)
@@ -15,12 +16,13 @@ Metrics des tours  (à effacer à la fin)
 */
 
 
-class Tower : public GameObject
+class Tower : public GameObject, public IObserver
 {
 public:
 	Tower();
 	~Tower();
 	void init(const int spriteNbr, const Vector2f& position);
+	void notify(Subject* subject);
 
 	void build();
 
@@ -29,6 +31,8 @@ public:
 	static const int MAGE_TOWER_SPRITE_NBR = 3;
 
 private:
+	int spriteNbr;
+
 	const float KING_MAX_HEALTH = 500;
 	const float MAX_HEALTH = 250;
 	
@@ -38,5 +42,8 @@ private:
 	const int MAGE_ATTACK_ANIM = 3;
 	IntRect* imagesMageAttack = nullptr;
 	void setupMageAnims();
+
+	bool towerBuiltOnPosition = false;
+	bool mouseInBound(const Vector2f mousePosition) const;
 };
 

@@ -1,6 +1,7 @@
 #include "SceneGame.h"
 #include "ContentPipeline.h"
 #include "Subject.h"
+#include <iostream>
 
 SceneGame::SceneGame(RenderWindow& renderWindow, Event& event, int currentWave) : Scene(renderWindow, event)
 {
@@ -51,6 +52,8 @@ bool SceneGame::init()
 
 void SceneGame::getInputs()
 {
+	inputs.reset();
+
 	//On passe l'événement en référence et celui-ci est chargé du dernier événement reçu!
 	while (renderWindow.pollEvent(event))
 	{
@@ -68,12 +71,12 @@ void SceneGame::getInputs()
 
 		if (event.type == Event::KeyPressed)
 		{
-			if (event.key.scancode == Keyboard::Scan::A) //Archer tower
+			if (event.key.scancode == Keyboard::Scan::Z) //Archer tower
 			{
 				instruction = Instruction::ARCHER_TOWER;
 			}
 
-			if (event.key.scancode == Keyboard::Scan::S) //Mage tower
+			if (event.key.scancode == Keyboard::Scan::X) //Mage tower
 			{
 				instruction = Instruction::MAGE_TOWER;
 			}
@@ -132,35 +135,19 @@ bool SceneGame::unload()
 	return true;
 }
 
+SceneGame::Instruction SceneGame::getInstruction() const {
+	return this->instruction;
+}
+
+Vector2f SceneGame::getMousePosition() const {
+	return inputs.mousePosition;
+}
+
 void SceneGame::manageLeftClick() {
 	if (inputs.mouseLeftButtonClicked)
 	{
-		switch (instruction)
-		{
-		case ARCHER_TOWER:
-			manageArcherPlacement();
-			break;
-
-		case MAGE_TOWER:
-			manageMagePlacement();
-			break;
-
-		case PLAGUE:
-		
-			break;
-
-		case SACRED_LIGHT:
-		
-			break;
-
-		default:
-			break;
-		}
+		notifyAllObservers();
 	}
-}
-
-void SceneGame::manageArcherPlacement() {
-
 }
 
 void SceneGame::manageMagePlacement() {
@@ -228,12 +215,13 @@ void SceneGame::initTowers() {
 	}
 	else
 	{
-		currentMapMaxNbrOfTower = NBR_MAX_TOWER - 1;
+		currentMapMaxNbrOfTower = NBR_MAX_TOWER;
+		towers[KING_TOWER_ARRAY_POSITION].init(Tower::KING_TOWER_SPRITE_NBR, KING_TOWER_POSITION_MAP2);
 		for (int i = 0; i < currentMapMaxNbrOfTower; i++)
 		{
 			emplacements[i].init(TOWER_EMPLACEMENTS_MAP2[i]);
-			towers[i].init(1, TOWER_EMPLACEMENTS_MAP2[i]);
-			towers[i + currentMapMaxNbrOfTower].init(2, TOWER_EMPLACEMENTS_MAP2[i]);
+			towers[i].init(Tower::ARCHER_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
+			towers[i + currentMapMaxNbrOfTower].init(Tower::MAGE_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
 		}
 	}
 }

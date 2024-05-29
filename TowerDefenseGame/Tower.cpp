@@ -1,8 +1,11 @@
 #include "Tower.h"
 #include "ContentPipeline.h"
+#include "SceneGame.h"
+#include "TowerEmplacement.h"
 
 Tower::Tower()
 {
+	Subject::addObserver(this);
 }
 
 Tower::~Tower()
@@ -35,6 +38,7 @@ void Tower::init(const int spriteNbr, const Vector2f& position) {
 		break;
 	}	
 
+	this->spriteNbr = spriteNbr;
 	setPosition(position);
 }
 
@@ -51,4 +55,58 @@ void Tower::setupMageAnims() {
 
 	setTextureRect(imagesMageAttack[0]);
 	setOrigin(MAGE_RECTANGLE_SIZE / 2, MAGE_RECTANGLE_SIZE / 2);
+}
+
+void Tower::notify(Subject* subject) {
+	if (typeid(*subject) == typeid(SceneGame))
+	{
+		if (!isActive())
+		{
+			SceneGame* game = static_cast<SceneGame*>(subject);
+			SceneGame::Instruction gameInstruction = game->getInstruction();
+			if (mouseInBound(game->getMousePosition()) && !towerBuiltOnPosition)
+			{
+				switch (gameInstruction)
+				{
+				case SceneGame::Instruction::ARCHER_TOWER:
+					if (spriteNbr == ARCHER_TOWER_SPRITE_NBR)
+						activate();
+					else
+						towerBuiltOnPosition = true;
+					break;
+				case SceneGame::Instruction::MAGE_TOWER:
+					if (spriteNbr == MAGE_TOWER_SPRITE_NBR)
+						activate();
+					else
+						towerBuiltOnPosition = true;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+	else if (typeid(*subject) == typeid(TowerEmplacement))
+	{
+		TowerEmplacement* emplacement = static_cast<TowerEmplacement*>(subject);
+		if (getPosition() == emplacement->getPosition())
+		{
+			towerBuiltOnPosition = false;
+		}
+	}
+}
+
+void Tower::build() {
+	setHealth(MAX_HEALTH);
+	activate();
+}
+
+bool Tower::mouseInBound(const Vector2f mousePosition) const {
+	FloatRect bounds = getGlobalBounds();
+	if (mousePosition.x >= bounds.left && mousePosition.x <= bounds.left+bounds.width &&
+		mousePosition.y >= bounds.top && mousePosition.y <= bounds.top + bounds.height)
+	{
+		return true;
+	}
+	return false;
 }
