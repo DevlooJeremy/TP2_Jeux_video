@@ -38,12 +38,12 @@ public:
 	int getHealth() const;
 	void damage(const float damageTaken);
 
-	void draw(RenderWindow& renderWindow) const;
+	void virtual draw(RenderWindow& renderWindow) const;
 
 protected:
 	static const float PI;
 	static const float RADIANS_TO_DEGREE;
-
+	float health;
 	CollisionCircle collisionCircle;
 
 private:
@@ -51,5 +51,5 @@ private:
 	float rotationRadians;
 	Vector2f backupPosition;
 
-	float health;
+	
 };
