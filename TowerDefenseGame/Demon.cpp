@@ -171,12 +171,12 @@ void Demon::notify(Subject* subject)
 
 void Demon::managePlague(Spell& spell)
 {
-	if (isAffectedByPlague)
+	if (isAffectedByPlague && !spell.isActive())
 	{
 		isAffectedByPlague = false;
 		resetModifiers();
 	}
-	else
+	else if (spell.isActive())
 	{
 		float distance = sqrt((spell.getPosition().x - getPosition().x) * (spell.getPosition().x - getPosition().x) + (spell.getPosition().y - getPosition().y) * (spell.getPosition().y - getPosition().y));
 		if (distance <= spell.getRange())
@@ -184,18 +184,19 @@ void Demon::managePlague(Spell& spell)
 			isAffectedByPlague = true;
 			damage(spell.getDamage());
 			damageModifier = spell.getBonusDamage();
+			setColor(Color::Color(96, 241, 76, 255));
 		}
 	}
 }
 
 void Demon::manageSacredLight(Spell& spell)
 {
-	if (isAffectedBySacredLight)
+	if (isAffectedBySacredLight && !spell.isActive())
 	{
 		isAffectedBySacredLight = false;
 		resetModifiers();
 	}
-	else
+	else if (spell.isActive())
 	{
 		float distance = sqrt((spell.getPosition().x - getPosition().x) * (spell.getPosition().x - getPosition().x) + (spell.getPosition().y - getPosition().y) * (spell.getPosition().y - getPosition().y));
 		if (distance <= spell.getRange())
@@ -203,6 +204,7 @@ void Demon::manageSacredLight(Spell& spell)
 			isAffectedBySacredLight = true;
 			damage(spell.getDamage());
 			speedModifier = spell.getSlow();
+			setColor(Color::Color(214, 172, 2, 255));
 		}
 	}
 }
@@ -236,6 +238,7 @@ void Demon::resetModifiers()
 {
 	speedModifier = 1.0f;
 	damageModifier = 1;
+	setColor(Color::White);
 }
 
 void Demon::manageDeath()

@@ -26,7 +26,6 @@ Scene::scenes SceneGame::run()
 
 bool SceneGame::init()
 {	
-	currentWave = 2;
 	if (currentWave % 2 != 0)
 		mapNbr = 1;
 	else
@@ -120,9 +119,19 @@ void SceneGame::draw()
 
 	towers[KING_TOWER_ARRAY_POSITION].draw(renderWindow);
 
-	for (size_t i = 0; i < NBR_WAYPOINTS; i++)
+	if (mapNbr == 1)
 	{
-		renderWindow.draw(waypoints[i]);
+		for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP; i++)
+		{
+			renderWindow.draw(waypoints[i]);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < NBR_WAYPOINTS; i++)
+		{
+			renderWindow.draw(waypoints[i]);
+		}
 	}
 
 	for (size_t i = 0; i < NB_SPELLS; i++)
@@ -222,15 +231,13 @@ void SceneGame::setupWaypoints()
 		waypoints[9].setPosition(968, 850);
 		waypoints[10].setPosition(1110, 682);
 
-		for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP; i++)
+		for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP - 1; i++)
 		{
 			waypoints[i].setNext(&waypoints[i + 1]);
 		}
 	}
 	else
 	{
-		//-Position des waypoints : (88.f, 412.f), (168.f, 465.f), (222.f, 588.f), (308.f, 670.f), (424.f, 668.f), (double sortie : 510.f, 590.f);
-		//(478.f, 468.f), (516.f, 380.f), (594.f, 360.f), (806.f, 368.f), (1140.f, 450.f), (660.f, 598.f), (804.f, 650.f), (1140.f, 680.f),
 		waypoints[0].setPosition(88.f, 412.f);
 		waypoints[1].setPosition(168.f, 465.f);
 		waypoints[2].setPosition(222.f, 588.f);
@@ -250,7 +257,6 @@ void SceneGame::setupWaypoints()
 		{
 			waypoints[i].setNext(&waypoints[i + 1]);
 		}
-		waypoints[5].setColor(Color::Red);
 		waypoints[5].setNext(nullptr);
 		waypoints[10].setNext(nullptr);
 	}
