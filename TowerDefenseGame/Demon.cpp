@@ -12,9 +12,11 @@ Demon::~Demon()
 	delete[] imagesDying;
 }
 
-bool Demon::init(Waypoint* waypoint)
+bool Demon::init(Waypoint* waypoint, Waypoint* secondPath)
 {
+	deactivate();
 	this->waypoint = waypoint;
+	this->secondPath = secondPath;
 	texture = ContentPipeline::getInstance().getDemonTexture();
 	setTexture(texture);
 	setOrigin(texture.getSize().x / 10, texture.getSize().y / 4);
@@ -27,6 +29,7 @@ bool Demon::init(Waypoint* waypoint)
 	redHealthBar.setTexture(ContentPipeline::getInstance().getRedBarTexture());
 
 	health = 60.0f;
+	isDying = false;
 
 	return true;
 }
@@ -58,13 +61,20 @@ void Demon::setImages()
 	setTextureRect(imagesFlying[0]);
 }
 
-void Demon::manageDemon(float deltaTime)
+void Demon::manageDemon(float deltaTime, int mapNbr)
 {
 	if (!isActive()) return;
+	if (isDying)
+	{
+		manageAnimation(deltaTime);
+		if (currentImage == NBR_ANIM_IMAGES -1) deactivate();
+		return;
+	}
 	moveTowardsWaypoint(deltaTime);
 	manageAnimation(deltaTime);
-	changeWaypoints();
+	changeWaypoints(mapNbr);
 	manageHealthBar();
+	manageDeath();
 }
 
 void Demon::moveTowardsWaypoint(float deltaTime)
@@ -75,11 +85,32 @@ void Demon::moveTowardsWaypoint(float deltaTime)
 	move(cos(angle) * moveSpeed * deltaTime,sin(angle) * moveSpeed * deltaTime);
 }
 
-void Demon::changeWaypoints()
+void Demon::changeWaypoints(int mapNbr)
 {
-	if (waypoint->getNext() == nullptr) return;
-	Vector2f distance = waypoint->getPosition() - getPosition();
-	if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+	if (mapNbr == 1)
+	{
+		if (waypoint->getNext() == nullptr) return;
+		Vector2f distance = waypoint->getPosition() - getPosition();
+		if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+	}
+	else if (mapNbr == 2)
+	{
+		if (waypoint->getNext() == nullptr)
+		{
+			if (isTakingSecondPath) return;
+			Vector2f distance = waypoint->getPosition() - getPosition();
+			if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE)
+			{
+				waypoint = secondPath;
+				isTakingSecondPath = true;
+			}
+		}
+		else
+		{
+			Vector2f distance = waypoint->getPosition() - getPosition();
+			if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+		}
+	}
 }
 
 void Demon::manageAnimation(const float deltaTime)
@@ -116,10 +147,10 @@ void Demon::setAnimationState(AnimationState animationState)
 	}
 }
 
-void Demon::spawn()
+void Demon::spawn(Vector2f spawnPosition)
 {
 	activate();
-	setPosition(610, -100);
+	setPosition(spawnPosition);
 }
 
 void Demon::notify(Subject* subject)
@@ -192,8 +223,8 @@ void Demon::manageHealthBar()
 void Demon::draw(RenderWindow& renderWindow) const
 {
 	GameObject::draw(renderWindow);
-	renderWindow.draw(redHealthBar);
-	renderWindow.draw(greenHealthBar);
+	if (isActive()) renderWindow.draw(redHealthBar);
+	if (isActive()) renderWindow.draw(greenHealthBar);
 }
 
 void Demon::damage(const float damage)
@@ -205,4 +236,13 @@ void Demon::resetModifiers()
 {
 	speedModifier = 1.0f;
 	damageModifier = 1;
+}
+
+void Demon::manageDeath()
+{
+	if (health <= 0)
+	{
+		isDying = true;
+		animationState = AnimationState::DEATH;
+	}
 }

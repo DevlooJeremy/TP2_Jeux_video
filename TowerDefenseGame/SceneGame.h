@@ -70,11 +70,12 @@ private:
 
 	Instruction instruction = NO_SELECTION;
 
-	const int NBR_WAYPOINTS = 11;
-	Waypoint waypoints[11];
+	const int NBR_WAYPOINTS_FIRST_MAP = 11;
+	static const int NBR_WAYPOINTS = 14;
+	Waypoint waypoints[14];
 
-	const int NBR_DEMON = 20;
-	Demon demons[20];
+	static const int NBR_DEMON = 20;
+	Demon demons[NBR_DEMON];
 	float spawnTimer = 0.0f;
 
 	const int NB_SPELLS = 2;
