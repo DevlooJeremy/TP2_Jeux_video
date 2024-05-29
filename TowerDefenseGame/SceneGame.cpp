@@ -53,7 +53,6 @@ bool SceneGame::init()
 void SceneGame::getInputs()
 {
 	inputs.reset();
-
 	//On passe l'événement en référence et celui-ci est chargé du dernier événement reçu!
 	while (renderWindow.pollEvent(event))
 	{
@@ -98,6 +97,7 @@ void SceneGame::update()
 {
 	manageLeftClick();
 	manageDemon();
+	manageSpells();
 }
 
 void SceneGame::draw()
@@ -119,6 +119,12 @@ void SceneGame::draw()
 	{
 		renderWindow.draw(waypoints[i]);
 	}
+
+	for (size_t i = 0; i < NB_SPELLS; i++)
+	{
+		spells[i].draw(renderWindow);
+	}
+
 	for (size_t i = 0; i < NBR_DEMON; i++)
 	{
 		demons[i].draw(renderWindow);
@@ -147,11 +153,52 @@ void SceneGame::manageLeftClick() {
 	if (inputs.mouseLeftButtonClicked)
 	{
 		notifyAllObservers();
+		switch (instruction)
+		{
+		case PLAGUE:
+			managePlagePlacement();
+			break;
+
+		case SACRED_LIGHT:
+			manageSacredLightPlacement();
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
-void SceneGame::manageMagePlacement() {
+void SceneGame::managePlagePlacement()
+{
+	for (size_t i = 0; i < NB_SPELLS; i++)
+	{
+		if (!spells[i].isActive())
+		{
+			spells[i].castPlague(inputs.mousePosition);
+			break;
+		}
+	}
+}
 
+void SceneGame::manageSacredLightPlacement()
+{
+	for (size_t i = 0; i < NB_SPELLS; i++)
+	{
+		if (!spells[i].isActive())
+		{
+			spells[i].castSacredLight(inputs.mousePosition);
+			break;
+		}
+	}
+}
+
+void SceneGame::manageSpells()
+{
+	for (size_t i = 0; i < NB_SPELLS; i++)
+	{
+		spells[i].manageSpell(deltaTime);
+	}
 }
 
 void SceneGame::setupWaypoints() 
@@ -186,7 +233,7 @@ void SceneGame::manageDemon()
 void SceneGame::spawnDemon()
 {
 	spawnTimer += deltaTime;
-	if (spawnTimer >= 1.1f)
+	if (spawnTimer >= 3.0f)
 	{
 		spawnTimer = 0.0f;
 		for (size_t i = 0; i < NBR_DEMON; i++)

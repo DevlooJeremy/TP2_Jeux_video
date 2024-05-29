@@ -1,5 +1,6 @@
 #pragma once
 #include "Subject.h"
+#include "GameObject.h"
 
 /*
 Metrics du Spell (à effacer à la fin)
@@ -17,16 +18,55 @@ va de 0 à 20, progressivement en avancant dans le temps
 
 */
 
-class Spell: public Subject
+class Spell: public Subject, public GameObject
 {
+
 public:
 	Spell();
+	float getRange() const;
+	void manageSpell(const float deltaTime);
+	void castSacredLight(const Vector2f position);
+	void castPlague(const Vector2f position);
+	void draw(RenderWindow& renderWindow) const override;
+	float getSlow() const;
+	int getDamage() const;
+	int getHealing() const;
+	int getBonusDamage() const;
+	int getAttackSpeedBonus() const;
+
+
+	enum SpellType { PLAGUE, SACRED_LIGHT };
+	SpellType getSpellType();
 	
 
 private:
+	void cast(Vector2f position);
+	void manageDuration(const float deltaTime);
+	void manageRunes();
+	void setDamage();
+	void setHealing();
 
-	enum SpellType { PLAGUE, SACRED_LIGHT };
 
 	SpellType spellType;
+	const float RANGE = 400.0f;
+	Sprite rune;
+
+	int damage;
+	int heal;
+
+
+	const int MINIMUM_HEAL = 6;
+	const int MAXIMUM_HEAL = 15;
+	const int MIN_DAMAGE = 1;
+	const int MAXIMUM_SACRED_LIGHT_DAMAGE = 5;
+	const int MAXIMUM_PLAGUE_DAMAGE = 10;
+
+	const float SLOW = 0.5f;
+	const int ATTACK_SPEED_BONUS = 2;
+	const int BONUS_DAMAGE = 2;
+
+	float timer = 0;
+	static bool sacredLightCasted;
+	static bool plagueCasted;
 };
 

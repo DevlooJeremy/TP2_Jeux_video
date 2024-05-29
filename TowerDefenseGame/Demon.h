@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Waypoint.h"
 #include "IObserver.h"
+#include "Spell.h"
 
 /*
 Metrics du Demon (à effacer à la fin)
@@ -25,12 +26,19 @@ public:
 	void manageDemon(float deltaTime);
 	void spawn();
 	void notify(Subject* subject) override;
+	void draw(RenderWindow& renderWindow) const override;
+	void damage(const float damage);
+
 private:
 	void setImages();
 	void moveTowardsWaypoint(float deltaTime);
 	void changeWaypoints();
 	void manageAnimation(const float deltaTime);
 	void runAnimation(const float deltaTime, const float timePerFrame, const int imageNumber, const bool linear, IntRect* images);
+	void manageSacredLight(Spell& spell);
+	void managePlague(Spell& spell);
+	void manageHealthBar();
+	void resetModifiers();
 	
 
 	enum AnimationState { FLY, DEATH };
@@ -57,5 +65,14 @@ private:
 	const int DEAD_ZONE = 3;
 
 	float speed = 0.9f;
+	float speedModifier = 1.0f;
+
+	float damageModifier = 1.0f;
+
+	bool isAffectedBySacredLight = false;
+	bool isAffectedByPlague = false;
+
+	Sprite redHealthBar;
+	Sprite greenHealthBar;
 };
 

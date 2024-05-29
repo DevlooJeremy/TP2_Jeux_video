@@ -7,6 +7,7 @@
 #include "Tower.h"
 #include "Waypoint.h"
 #include "Demon.h"
+#include "Spell.h"
 
 /*
 Metrics de sceneGame OU du level 1 (à effacer à la fin)
@@ -53,6 +54,9 @@ private:
 	void manageLeftClick();
 	void manageArcherPlacement();
 	void manageMagePlacement();
+	void managePlagePlacement();
+	void manageSacredLightPlacement();
+	void manageSpells();
 
 	void setupWaypoints();
 	void manageDemon();
@@ -72,6 +76,11 @@ private:
 	const int NBR_DEMON = 20;
 	Demon demons[20];
 	float spawnTimer = 0.0f;
+
+	const int NB_SPELLS = 2;
+	Spell spells[2];
+	bool sacredLightCasted = false;
+	bool plagueCasted = false;
 
 
 	Sprite map;
