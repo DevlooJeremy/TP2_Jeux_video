@@ -23,6 +23,7 @@ bool Demon::init(Waypoint* waypoint, Waypoint* secondPath)
 	attackBuffer = ContentPipeline::getInstance().getDemonAttackSoundBuffer();
 	attackSound.setBuffer(attackBuffer);
 	setImages();
+	setCollisionCircleRadius(getTextureRect().getSize().x / 2);
 
 	greenHealthBar.setTexture(ContentPipeline::getInstance().getGreenBarTexture());
 
