@@ -241,6 +241,7 @@ void SceneGame::manageTowers() {
 	}
 }
 
+
 void SceneGame::manageProjectiles() {
 	for (int i = 0; i < NBR_MAX_TOWER_PROJECTILES*2; i++)
 	{
@@ -302,6 +303,10 @@ void SceneGame::manageDemon()
 	for (size_t i = 0; i < NBR_DEMON; i++)
 	{
 		demons[i].manageDemon(deltaTime, mapNbr, currentWave);
+	}
+	for (size_t i = 0; i < NBR_DEMON; i++)
+	{
+		demons[i].shoot(towers, 19, deltaTime);
 	}
 	spawnDemon();
 }
@@ -384,6 +389,19 @@ void SceneGame::notify(Subject* subject) {
 					projectiles[index].shoot(&demons[tower->getClosestDemonIndex()], tower->getPosition());
 					break;
 				}
+			}
+		}
+	}
+
+	if (typeid(*subject) == typeid(Demon))
+	{
+		Demon* demon = static_cast<Demon*>(subject);
+		if (demon->isShooting())
+		{
+			for (size_t i = 20; i < NBR_TOTAL_MAX_PROJECTILES; i++)
+			{
+				projectiles[i].shoot(&towers[demon->getClosestTowerIndex()], demon->getPosition());
+				break;
 			}
 		}
 	}

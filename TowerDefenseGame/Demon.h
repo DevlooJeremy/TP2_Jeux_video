@@ -17,7 +17,8 @@ Metrics du Demon (à effacer à la fin)
 - Position de départ des démons au niveau 2: -100, 410
 */
 
-class Demon: public GameObject, public IObserver
+
+class Demon: public GameObject, public IObserver, public Subject
 {
 public:
 	Demon();
@@ -28,6 +29,10 @@ public:
 	void notify(Subject* subject) override;
 	void draw(RenderWindow& renderWindow) const override;
 	void damage(const float damage);
+	void shoot(GameObject towers[], int nbrTowers, float deltaTime);
+
+	int getClosestTowerIndex();
+	bool isShooting();
 
 private:
 	void setImages();
@@ -79,5 +84,11 @@ private:
 
 	bool isDying = false;
 	bool isTakingSecondPath = false;
+
+	float shotCooldown = 0.0f;
+	const int RANGE = 250;
+	bool shooting = false;
+	int closestTowerIndex;
+	float maxShotCooldown = 1.05f;
 };
 

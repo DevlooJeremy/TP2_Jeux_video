@@ -124,7 +124,7 @@ void Tower::takeDamage(const int damage) {
 	}
 }
 
-void Tower::shoot(const Demon demons[], const int nbrOfDemons, const float deltaTime) {
+void Tower::shoot(const GameObject demons[], const int nbrOfDemons, const float deltaTime) {
 	if (isActive() && shotCooldown <= 0)
 	{
 		float lastChosenDemonDistance = RANGE + 1;
