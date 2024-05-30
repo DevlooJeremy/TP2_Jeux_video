@@ -199,7 +199,7 @@ void SceneGame::managePlagePlacement()
 	{
 		if (!spells[i].isActive())
 		{
-			spells[i].castPlague(inputs.mousePosition);
+			if (spells[i].castPlague(inputs.mousePosition)) mana -= PLAGUE_COST;;
 			break;
 		}
 	}
@@ -211,7 +211,7 @@ void SceneGame::manageSacredLightPlacement()
 	{
 		if (!spells[i].isActive())
 		{
-			spells[i].castSacredLight(inputs.mousePosition);
+			if (spells[i].castSacredLight(inputs.mousePosition)) mana -= SACRED_LIGHT_COST;;
 			break;
 		}
 	}

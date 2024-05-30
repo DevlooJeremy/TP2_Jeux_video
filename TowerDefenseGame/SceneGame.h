@@ -89,6 +89,8 @@ private:
 	Spell spells[2];
 	bool sacredLightCasted = false;
 	bool plagueCasted = false;
+	int const PLAGUE_COST = 20;
+	int const SACRED_LIGHT_COST = 60;
 
 	int mana = 500;
 	float manaTimer = 0.0f;
