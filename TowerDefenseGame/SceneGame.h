@@ -71,6 +71,8 @@ private:
 
 	void manageMana();
 
+	void manageEndWave();
+
 	View view;
 	Hud hud;
 	Inputs inputs;

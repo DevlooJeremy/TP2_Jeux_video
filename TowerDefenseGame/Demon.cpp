@@ -250,3 +250,47 @@ void Demon::manageDeath()
 		animationState = AnimationState::DEATH;
 	}
 }
+
+void Demon::shoot(GameObject towers[], int nbrTowers, float deltaTime)
+{
+	if (isActive() && shotCooldown <= 0.0f)
+	{
+		float lastChosenTowerDistance = RANGE + 1;
+		bool towerInRange = false;
+		for (int i = 0; i < nbrTowers; i++)
+		{
+			if (!towers[i].isActive()) continue;
+			float distanceX = abs(towers[i].getPosition().x - getPosition().x);
+			float distanceY = abs(towers[i].getPosition().y - getPosition().y);
+
+			float distance = sqrtf(distanceX * distanceX + distanceY * distanceY);
+			if (distance <= RANGE && distance <= lastChosenTowerDistance)
+			{
+				lastChosenTowerDistance = distance;
+				closestTowerIndex = i;
+				towerInRange = true;
+			}
+		}
+		if (towerInRange)
+		{
+			shotCooldown = maxShotCooldown;
+			shooting = true;
+			notifyAllObservers();
+			shooting = false;
+		}
+	}
+	else if (shotCooldown > 0)
+	{
+		shotCooldown -= deltaTime;
+	}
+}
+
+bool Demon::isShooting()
+{
+	return shooting;
+}
+
+int Demon::getClosestTowerIndex()
+{
+	return closestTowerIndex;
+}

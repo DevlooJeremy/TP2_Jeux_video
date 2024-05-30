@@ -16,7 +16,6 @@ Metrics des tours  (à effacer à la fin)
 - L'image 0 est l'image idle. Quand on initie le tir, on passe tout de suite à l'image 1.
 */
 
-class Demon;
 
 class Tower : public GameObject, public IObserver, public Subject
 {
@@ -29,7 +28,7 @@ public:
 
 	void build();
 	void takeDamage(const int damage);
-	void shoot(const Demon demons[], const int nbrOfDemons, const float deltaTime);
+	void shoot(const GameObject demons[], const int nbrOfDemons, const float deltaTime);
 
 	bool isShooting() const;
 	int getClosestDemonIndex() const;
