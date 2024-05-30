@@ -2,6 +2,7 @@
 #include "ContentPipeline.h"
 #include "SceneGame.h"
 #include "TowerEmplacement.h"
+#include "Spell.h"
 #include <iostream>
 
 Tower::Tower()
@@ -101,7 +102,6 @@ void Tower::manageMageAnims(float deltaTime) {
 			{
 				state = IDLE;
 				finishedAnimations = true;
-				playedAnim = true;
 				lastRect = 0;
 			}
 		}
@@ -128,13 +128,13 @@ void Tower::notify(Subject* subject) {
 				{
 				case SceneGame::Instruction::ARCHER_TOWER:
 					if (spriteNbr == ARCHER_TOWER_SPRITE_NBR)
-						activate();
+						build();
 					else
 						towerBuiltOnPosition = true;
 					break;
 				case SceneGame::Instruction::MAGE_TOWER:
 					if (spriteNbr == MAGE_TOWER_SPRITE_NBR)
-						activate();
+						build();
 					else
 						towerBuiltOnPosition = true;
 					break;
@@ -152,6 +152,28 @@ void Tower::notify(Subject* subject) {
 			towerBuiltOnPosition = false;
 		}
 	}
+	else if (typeid(*subject) == typeid(Spell))
+	{
+		Spell* spell = static_cast<Spell*>(subject);
+		float distanceX = abs(spell->getPosition().x - getPosition().x);
+		float distanceY = abs(spell->getPosition().y - getPosition().y);
+
+		float distance = sqrtf(distanceX * distanceX + distanceY * distanceY);
+		if (distance <= spell->getRange() && isActive())
+		{
+			switch (spell->getSpellType())
+			{
+			case Spell::PLAGUE:
+				managePlague(spell->getDamage(), spell->getBonusDamage());
+				break;
+			case Spell::SACRED_LIGHT:
+				manageSacredLight(spell->getAttackSpeedBonus(), spell->getHealing());
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 bool Tower::mouseInBound(const Vector2f mousePosition) const {
@@ -167,10 +189,13 @@ bool Tower::mouseInBound(const Vector2f mousePosition) const {
 void Tower::build() {
 	setHealth(MAX_HEALTH);
 	activate();
+	built = true;
+	notifyAllObservers();
+	built = false;
 }
 
 void Tower::takeDamage(const int damage) {
-	this->damage(damage);
+	this->damage(damage * damageMultiplier);
 	manageHealthBar();
 	if (getHealth() <= 0)
 	{
@@ -191,7 +216,7 @@ void Tower::shoot(const Demon demons[], const int nbrOfDemons, const float delta
 			float distanceY = abs(demons[i].getPosition().y - getPosition().y);
 
 			float distance = sqrtf(distanceX * distanceX + distanceY * distanceY);
-			if (distance <= RANGE && distance <= lastChosenDemonDistance)
+			if (distance <= RANGE && distance <= lastChosenDemonDistance && demons[i].isActive())
 			{
 				lastChosenDemonDistance = distance;
 				closestDemonIndex = i;
@@ -204,10 +229,22 @@ void Tower::shoot(const Demon demons[], const int nbrOfDemons, const float delta
 			{
 				state = ATTACK;
 				finishedAnimations = false;
+				playedAnim = true;
+				float demonPositionX = demons[closestDemonIndex].getPosition().x;
+				if (demonPositionX > getPosition().x && !facingLeft)
+				{
+					scale(-1, 1);
+					facingLeft = true;
+				}
+				else if (demonPositionX <= getPosition().x && facingLeft)
+				{
+					scale(-1, 1);
+					facingLeft = false;
+				}
 			}
 			if (finishedAnimations)
 			{
-				shotCooldown = maxShotCooldown;
+				shotCooldown = maxShotCooldown / ASBonus;
 				shooting = true;
 				notifyAllObservers();
 				shooting = false;
@@ -222,6 +259,16 @@ void Tower::shoot(const Demon demons[], const int nbrOfDemons, const float delta
 	}
 }
 
+void Tower::managePlague(const int damage, const int bonusDamage) {
+	this->damage(damage);
+	damageMultiplier = bonusDamage;
+}
+
+void Tower::manageSacredLight(const int bonusASpeed, const int healing) {
+	ASBonus = bonusASpeed;
+	setHealth(getHealth() + healing);
+}
+
 bool Tower::isShooting() const {
 	return shooting;
 }
@@ -232,4 +279,8 @@ int Tower::getClosestDemonIndex() const {
 
 int Tower::getTowerType() const {
 	return spriteNbr;
+}
+
+bool Tower::asBeenBuilt() const {
+	return built;
 }

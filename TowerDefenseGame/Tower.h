@@ -34,11 +34,14 @@ public:
 	bool isShooting() const;
 	int getClosestDemonIndex() const;
 	int getTowerType() const;
+	bool asBeenBuilt() const;
 
 	static const int KING_TOWER_SPRITE_NBR = 1;
 	static const int ARCHER_TOWER_SPRITE_NBR = 2;
 	static const int MAGE_TOWER_SPRITE_NBR = 3;
 
+	static const int ARCHER_MANA_COST = 70;
+	static const int MAGE_MANA_COST = 100;
 private:
 	int spriteNbr;
 
@@ -53,6 +56,7 @@ private:
 	IntRect* imagesMageAttack = nullptr;
 	bool finishedAnimations = true;
 	bool playedAnim = false;
+	bool facingLeft = false;
 	void setupMageAnims();
 	void manageMageAnims(float deltaTime);
 	enum AnimationState { IDLE, ATTACK };
@@ -63,13 +67,19 @@ private:
 
 	bool towerBuiltOnPosition = false;
 	bool mouseInBound(const Vector2f mousePosition) const;
+	bool built = false;
 
 	const int RANGE = 300;
 	int closestDemonIndex;
 	const float ARCHER_MAX_SHOT_COOLDOWN = 0.8;
 	const float MAGE_MAX_SHOT_COOLDOWN = 1.5;
 	float maxShotCooldown;
+	int ASBonus = 1;
 	float shotCooldown = 0;
 	bool shooting = false;
+
+	void managePlague(const int damage, const int bonusDamage);
+	void manageSacredLight(const int bonusASpeed, const int healing);
+	int damageMultiplier = 1;
 };
 

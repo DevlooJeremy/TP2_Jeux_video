@@ -389,6 +389,19 @@ void SceneGame::notify(Subject* subject) {
 				}
 			}
 		}
+		if (tower->asBeenBuilt())
+		{
+			std::cout << "Test";
+			switch (tower->getTowerType())
+			{
+			case Tower::ARCHER_TOWER_SPRITE_NBR:
+				mana -= Tower::ARCHER_MANA_COST;
+				break;
+			case Tower::MAGE_TOWER_SPRITE_NBR:
+				mana -= Tower::MAGE_MANA_COST;
+				break;
+			}
+		}
 	}
 }
 
