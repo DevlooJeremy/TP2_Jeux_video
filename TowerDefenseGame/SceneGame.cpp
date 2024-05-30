@@ -40,7 +40,11 @@ bool SceneGame::init()
 	setupWaypoints();
 	for (size_t i = 0; i < NBR_DEMON; i++)
 	{
-		demons[i].init(&waypoints[0]);
+		int secondPath = rand() & 2 + 1;
+		Waypoint* path;
+		if (secondPath == 1) path = &waypoints[6];
+		else path = &waypoints[11];
+		demons[i].init(&waypoints[0], path);
 		Subject::addObserver(&demons[i]);
 	}
 
@@ -90,6 +94,11 @@ void SceneGame::getInputs()
 			{
 				instruction = Instruction::SACRED_LIGHT;
 			}
+
+			if (event.key.scancode == Keyboard::Scan::W)
+			{
+				inputs.toggleWapointsClicked = true;
+			}
 		}
 	}
 }
@@ -101,6 +110,8 @@ void SceneGame::update()
 	manageSpells();
 	manageTowers();
 	manageProjectiles();
+	manageWaypoints();
+	manageMana();
 }
 
 void SceneGame::draw()
@@ -118,9 +129,22 @@ void SceneGame::draw()
 
 	towers[KING_TOWER_ARRAY_POSITION].draw(renderWindow);
 
-	for (size_t i = 0; i < 11; i++)
+	if (showWaypoints) 
 	{
-		renderWindow.draw(waypoints[i]);
+		if (mapNbr == 1)
+		{
+			for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP; i++)
+			{
+				renderWindow.draw(waypoints[i]);
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < NBR_WAYPOINTS; i++)
+			{
+				renderWindow.draw(waypoints[i]);
+			}
+		}
 	}
 
 	for (size_t i = 0; i < NB_SPELLS; i++)
@@ -184,7 +208,7 @@ void SceneGame::managePlagePlacement()
 	{
 		if (!spells[i].isActive())
 		{
-			spells[i].castPlague(inputs.mousePosition);
+			if (spells[i].castPlague(inputs.mousePosition)) mana -= PLAGUE_COST;
 			break;
 		}
 	}
@@ -196,7 +220,7 @@ void SceneGame::manageSacredLightPlacement()
 	{
 		if (!spells[i].isActive())
 		{
-			spells[i].castSacredLight(inputs.mousePosition);
+			if (spells[i].castSacredLight(inputs.mousePosition)) mana -= SACRED_LIGHT_COST;
 			break;
 		}
 	}
@@ -226,29 +250,58 @@ void SceneGame::manageProjectiles() {
 
 void SceneGame::setupWaypoints() 
 {
-	waypoints[0].setPosition(610, 8);
-	waypoints[1].setPosition(630, 222);
-	waypoints[2].setPosition(595, 444);
-	waypoints[3].setPosition(478, 514);
-	waypoints[4].setPosition(320, 558);
-	waypoints[5].setPosition(260, 620);
-	waypoints[6].setPosition(280, 720);
-	waypoints[7].setPosition(348, 812);
-	waypoints[8].setPosition(720, 830);
-	waypoints[9].setPosition(968, 850);
-	waypoints[10].setPosition(1110, 682);
-
-	for (size_t i = 0; i < NBR_WAYPOINTS - 1; i++)
+	if (mapNbr == 1)
 	{
-		waypoints[i].setNext(&waypoints[i + 1]);
+		waypoints[0].setPosition(610, 8);
+		waypoints[1].setPosition(630, 222);
+		waypoints[2].setPosition(595, 444);
+		waypoints[3].setPosition(478, 514);
+		waypoints[4].setPosition(320, 558);
+		waypoints[5].setPosition(260, 620);
+		waypoints[6].setPosition(280, 720);
+		waypoints[7].setPosition(348, 812);
+		waypoints[8].setPosition(720, 830);
+		waypoints[9].setPosition(968, 850);
+		waypoints[10].setPosition(1110, 682);
+
+		for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP - 1; i++)
+		{
+			waypoints[i].setNext(&waypoints[i + 1]);
+		}
 	}
+	else
+	{
+		waypoints[0].setPosition(88.f, 412.f);
+		waypoints[1].setPosition(168.f, 465.f);
+		waypoints[2].setPosition(222.f, 588.f);
+		waypoints[3].setPosition(308.f, 670.f);
+		waypoints[4].setPosition(424.f, 668.f);
+		waypoints[5].setPosition(510.f, 590.f); //double sortie
+		waypoints[6].setPosition(478.f, 468.f); //choix 1
+		waypoints[7].setPosition(516.f, 380.f);
+		waypoints[8].setPosition(594.f, 360.f);
+		waypoints[9].setPosition(806.f, 368.f);
+		waypoints[10].setPosition(1140.f, 450.f);
+		waypoints[11].setPosition(660.f, 598.f); // choix 2
+		waypoints[12].setPosition(804.f, 650.f);
+		waypoints[13].setPosition(1140.f, 680.f);
+
+		for (size_t i = 0; i < NBR_WAYPOINTS - 1; i++)
+		{
+			waypoints[i].setNext(&waypoints[i + 1]);
+		}
+		waypoints[5].setNext(nullptr);
+		waypoints[10].setNext(nullptr);
+	}
+
+	
 }
 
 void SceneGame::manageDemon()
 {
 	for (size_t i = 0; i < NBR_DEMON; i++)
 	{
-		demons[i].manageDemon(deltaTime);
+		demons[i].manageDemon(deltaTime, mapNbr, currentWave);
 	}
 	spawnDemon();
 }
@@ -263,7 +316,11 @@ void SceneGame::spawnDemon()
 		{
 			if (!demons[i].isActive()) 
 			{
-				demons[i].spawn();
+				Vector2f position;
+				if (mapNbr == 1) position = Vector2f(610, -100);
+				else position = Vector2f(-100, 410);
+				demons[i].spawn(position);
+				demonSpawned += 1;
 				break;
 			}
 
@@ -330,4 +387,24 @@ void SceneGame::notify(Subject* subject) {
 			}
 		}
 	}
+}
+
+void SceneGame::manageWaypoints()
+{
+	if (inputs.toggleWapointsClicked)
+	{
+		if (showWaypoints) showWaypoints = false;
+		else showWaypoints = true;
+	}
+}
+
+void SceneGame::manageMana()
+{
+	if (manaTimer >= 0.2)
+	{
+		mana += 1;
+		manaTimer = 0.0f;
+	}
+	manaTimer += deltaTime;
+	hud.setMana(mana);
 }

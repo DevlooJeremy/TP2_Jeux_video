@@ -45,9 +45,9 @@ float Spell::getRange() const
 	return RANGE;
 }
 
-void  Spell::castSacredLight(const Vector2f position)
+bool  Spell::castSacredLight(const Vector2f position)
 {
-	if (Spell::sacredLightCasted) return;
+	if (Spell::sacredLightCasted) return false;
 	Spell::sacredLightCasted = true;
 	activate();
 	spellType = SpellType::SACRED_LIGHT;
@@ -55,17 +55,19 @@ void  Spell::castSacredLight(const Vector2f position)
 	setOrigin(ContentPipeline::getInstance().getSacredLightTexture().getSize().x / 2, ContentPipeline::getInstance().getSacredLightTexture().getSize().y / 2);
 	setHealing();
 	cast(position);
+	return true;
 }
 
-void Spell::castPlague(const Vector2f position)
+bool Spell::castPlague(const Vector2f position)
 {
-	if (Spell::plagueCasted) return;
+	if (Spell::plagueCasted) return false;
 	Spell::plagueCasted = true;
 	activate();
 	spellType = SpellType::PLAGUE;
 	setTexture(ContentPipeline::getInstance().getPlagueTexture());
 	setOrigin(ContentPipeline::getInstance().getPlagueTexture().getSize().x / 2, ContentPipeline::getInstance().getPlagueTexture().getSize().y / 2);
 	cast(position);
+	return true;
 }
 
 void Spell::cast(Vector2f position)

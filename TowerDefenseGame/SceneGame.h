@@ -48,8 +48,6 @@ public:
 	static enum Instruction {ARCHER_TOWER, MAGE_TOWER, PLAGUE, SACRED_LIGHT, NO_SELECTION};
 	Instruction getInstruction() const;
 	Vector2f getMousePosition() const;
-
-	static const int NBR_DEMON = 20;
 private:
 	void getInputs() override;
 	void update() override;
@@ -57,6 +55,7 @@ private:
 	bool unload() override;
 
 	void setupWaypoints();
+	void manageWaypoints();
 	void manageDemon();
 	void spawnDemon();
 
@@ -70,22 +69,36 @@ private:
 	void manageTowers();
 	void manageProjectiles();
 
+	void manageMana();
+
 	View view;
 	Hud hud;
 	Inputs inputs;
 
 	Instruction instruction = NO_SELECTION;
 
-	const int NBR_WAYPOINTS = 11;
-	Waypoint waypoints[11];
+	const int NBR_WAYPOINTS_FIRST_MAP = 11;
+	static const int NBR_WAYPOINTS = 14;
+	Waypoint waypoints[NBR_WAYPOINTS];
+	bool showWaypoints = false;
 
-	Demon demons[20];
+
+	static const int NBR_DEMON = 20;
+	Demon demons[NBR_DEMON];
+	
+	const int demonKillToWin = 50;
+	int demonSpawned = 0;
 	float spawnTimer = 0.0f;
 
 	const int NB_SPELLS = 2;
 	Spell spells[2];
 	bool sacredLightCasted = false;
 	bool plagueCasted = false;
+	int const PLAGUE_COST = 20;
+	int const SACRED_LIGHT_COST = 60;
+
+	int mana = 500;
+	float manaTimer = 0.0f;
 
 	Sprite map;
 	int mapNbr;

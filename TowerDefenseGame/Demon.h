@@ -22,23 +22,24 @@ class Demon: public GameObject, public IObserver
 public:
 	Demon();
 	~Demon();
-	bool init(Waypoint* waypoint);
-	void manageDemon(float deltaTime);
-	void spawn();
+	bool init(Waypoint* waypoint, Waypoint* secondPath);
+	void manageDemon(float deltaTime, int mapNbr, int currentWave);
+	void spawn(Vector2f spawnPosition);
 	void notify(Subject* subject) override;
 	void draw(RenderWindow& renderWindow) const override;
 	void damage(const float damage);
 
 private:
 	void setImages();
-	void moveTowardsWaypoint(float deltaTime);
-	void changeWaypoints();
+	void moveTowardsWaypoint(float deltaTime, int currentWave);
+	void changeWaypoints(int mapNbr);
 	void manageAnimation(const float deltaTime);
 	void runAnimation(const float deltaTime, const float timePerFrame, const int imageNumber, const bool linear, IntRect* images);
 	void manageSacredLight(Spell& spell);
 	void managePlague(Spell& spell);
 	void manageHealthBar();
 	void resetModifiers();
+	void manageDeath();
 	
 
 	enum AnimationState { FLY, DEATH };
@@ -62,9 +63,10 @@ private:
 	IntRect* imagesDying = nullptr;
 
 	Waypoint* waypoint = nullptr;
+	Waypoint* secondPath = nullptr;
 	const int DEAD_ZONE = 3;
 
-	float speed = 0.9f;
+	float speed = 1.0f;
 	float speedModifier = 1.0f;
 
 	float damageModifier = 1.0f;
@@ -74,5 +76,8 @@ private:
 
 	Sprite redHealthBar;
 	Sprite greenHealthBar;
+
+	bool isDying = false;
+	bool isTakingSecondPath = false;
 };
 

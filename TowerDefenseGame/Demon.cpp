@@ -12,21 +12,25 @@ Demon::~Demon()
 	delete[] imagesDying;
 }
 
-bool Demon::init(Waypoint* waypoint)
+bool Demon::init(Waypoint* waypoint, Waypoint* secondPath)
 {
+	deactivate();
 	this->waypoint = waypoint;
+	this->secondPath = secondPath;
 	texture = ContentPipeline::getInstance().getDemonTexture();
 	setTexture(texture);
 	setOrigin(texture.getSize().x / 10, texture.getSize().y / 4);
 	attackBuffer = ContentPipeline::getInstance().getDemonAttackSoundBuffer();
 	attackSound.setBuffer(attackBuffer);
 	setImages();
+	setCollisionCircleRadius(getTextureRect().getSize().x / 2);
 
 	greenHealthBar.setTexture(ContentPipeline::getInstance().getGreenBarTexture());
 
 	redHealthBar.setTexture(ContentPipeline::getInstance().getRedBarTexture());
 
 	health = 60.0f;
+	isDying = false;
 
 	return true;
 }
@@ -58,28 +62,56 @@ void Demon::setImages()
 	setTextureRect(imagesFlying[0]);
 }
 
-void Demon::manageDemon(float deltaTime)
+void Demon::manageDemon(float deltaTime, int mapNbr, int currentWave)
 {
 	if (!isActive()) return;
-	moveTowardsWaypoint(deltaTime);
+	if (isDying)
+	{
+		manageAnimation(deltaTime);
+		if (currentImage == NBR_ANIM_IMAGES -1) deactivate();
+		return;
+	}
+	moveTowardsWaypoint(deltaTime, currentWave);
 	manageAnimation(deltaTime);
-	changeWaypoints();
+	changeWaypoints(mapNbr);
 	manageHealthBar();
+	manageDeath();
 }
 
-void Demon::moveTowardsWaypoint(float deltaTime)
+void Demon::moveTowardsWaypoint(float deltaTime, int currentWave)
 {
 	if (animationState != AnimationState::DEATH) setAnimationState(AnimationState::FLY);
-	float moveSpeed = speed * 60 * speedModifier;
+	float moveSpeed = speed * (54 + (6 * currentWave)) * speedModifier;
 	float angle = atan2f(waypoint->getPosition().y - getPosition().y,waypoint->getPosition().x - getPosition().x);
 	move(cos(angle) * moveSpeed * deltaTime,sin(angle) * moveSpeed * deltaTime);
 }
 
-void Demon::changeWaypoints()
+void Demon::changeWaypoints(int mapNbr)
 {
-	if (waypoint->getNext() == nullptr) return;
-	Vector2f distance = waypoint->getPosition() - getPosition();
-	if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+	if (mapNbr == 1)
+	{
+		if (waypoint->getNext() == nullptr) return;
+		Vector2f distance = waypoint->getPosition() - getPosition();
+		if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+	}
+	else if (mapNbr == 2)
+	{
+		if (waypoint->getNext() == nullptr)
+		{
+			if (isTakingSecondPath) return;
+			Vector2f distance = waypoint->getPosition() - getPosition();
+			if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE)
+			{
+				waypoint = secondPath;
+				isTakingSecondPath = true;
+			}
+		}
+		else
+		{
+			Vector2f distance = waypoint->getPosition() - getPosition();
+			if (std::abs(distance.x) < DEAD_ZONE && std::abs(distance.y) < DEAD_ZONE) waypoint = waypoint->getNext();
+		}
+	}
 }
 
 void Demon::manageAnimation(const float deltaTime)
@@ -116,10 +148,10 @@ void Demon::setAnimationState(AnimationState animationState)
 	}
 }
 
-void Demon::spawn()
+void Demon::spawn(Vector2f spawnPosition)
 {
 	activate();
-	setPosition(610, -100);
+	setPosition(spawnPosition);
 }
 
 void Demon::notify(Subject* subject)
@@ -140,12 +172,12 @@ void Demon::notify(Subject* subject)
 
 void Demon::managePlague(Spell& spell)
 {
-	if (isAffectedByPlague)
+	if (isAffectedByPlague && !spell.isActive())
 	{
 		isAffectedByPlague = false;
 		resetModifiers();
 	}
-	else
+	else if (spell.isActive())
 	{
 		float distance = sqrt((spell.getPosition().x - getPosition().x) * (spell.getPosition().x - getPosition().x) + (spell.getPosition().y - getPosition().y) * (spell.getPosition().y - getPosition().y));
 		if (distance <= spell.getRange())
@@ -153,18 +185,19 @@ void Demon::managePlague(Spell& spell)
 			isAffectedByPlague = true;
 			damage(spell.getDamage());
 			damageModifier = spell.getBonusDamage();
+			setColor(Color::Color(96, 241, 76, 255));
 		}
 	}
 }
 
 void Demon::manageSacredLight(Spell& spell)
 {
-	if (isAffectedBySacredLight)
+	if (isAffectedBySacredLight && !spell.isActive())
 	{
 		isAffectedBySacredLight = false;
 		resetModifiers();
 	}
-	else
+	else if (spell.isActive())
 	{
 		float distance = sqrt((spell.getPosition().x - getPosition().x) * (spell.getPosition().x - getPosition().x) + (spell.getPosition().y - getPosition().y) * (spell.getPosition().y - getPosition().y));
 		if (distance <= spell.getRange())
@@ -172,6 +205,7 @@ void Demon::manageSacredLight(Spell& spell)
 			isAffectedBySacredLight = true;
 			damage(spell.getDamage());
 			speedModifier = spell.getSlow();
+			setColor(Color::Color(214, 172, 2, 255));
 		}
 	}
 }
@@ -192,8 +226,8 @@ void Demon::manageHealthBar()
 void Demon::draw(RenderWindow& renderWindow) const
 {
 	GameObject::draw(renderWindow);
-	renderWindow.draw(redHealthBar);
-	renderWindow.draw(greenHealthBar);
+	if (isActive()) renderWindow.draw(redHealthBar);
+	if (isActive()) renderWindow.draw(greenHealthBar);
 }
 
 void Demon::damage(const float damage)
@@ -205,4 +239,14 @@ void Demon::resetModifiers()
 {
 	speedModifier = 1.0f;
 	damageModifier = 1;
+	setColor(Color::White);
+}
+
+void Demon::manageDeath()
+{
+	if (health <= 0)
+	{
+		isDying = true;
+		animationState = AnimationState::DEATH;
+	}
 }

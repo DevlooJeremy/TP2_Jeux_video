@@ -25,8 +25,8 @@ public:
 	Spell();
 	float getRange() const;
 	void manageSpell(const float deltaTime);
-	void castSacredLight(const Vector2f position);
-	void castPlague(const Vector2f position);
+	bool castSacredLight(const Vector2f position);
+	bool castPlague(const Vector2f position);
 	void draw(RenderWindow& renderWindow) const override;
 	float getSlow() const;
 	int getDamage() const;

@@ -4,7 +4,6 @@
 Waypoint::Waypoint()
 {
 	setTexture(ContentPipeline::getInstance().getWaypointTexture());
-	//nextWaypoint = nullptr;
 }
 
 Waypoint::~Waypoint()
