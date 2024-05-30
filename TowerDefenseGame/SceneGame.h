@@ -57,6 +57,7 @@ private:
 	void managePlagePlacement();
 	void manageSacredLightPlacement();
 	void manageSpells();
+	void manageWaypoints();
 
 	void setupWaypoints();
 	void manageDemon();
@@ -72,10 +73,14 @@ private:
 
 	const int NBR_WAYPOINTS_FIRST_MAP = 11;
 	static const int NBR_WAYPOINTS = 14;
-	Waypoint waypoints[14];
+	Waypoint waypoints[NBR_WAYPOINTS];
+	bool showWaypoints = false;
 
 	static const int NBR_DEMON = 20;
 	Demon demons[NBR_DEMON];
+	
+	const int demonKillToWin = 50;
+	int demonSpawned = 0;
 	float spawnTimer = 0.0f;
 
 	const int NB_SPELLS = 2;

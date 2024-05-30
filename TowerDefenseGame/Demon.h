@@ -23,7 +23,7 @@ public:
 	Demon();
 	~Demon();
 	bool init(Waypoint* waypoint, Waypoint* secondPath);
-	void manageDemon(float deltaTime, int mapNbr);
+	void manageDemon(float deltaTime, int mapNbr, int currentWave);
 	void spawn(Vector2f spawnPosition);
 	void notify(Subject* subject) override;
 	void draw(RenderWindow& renderWindow) const override;
@@ -31,7 +31,7 @@ public:
 
 private:
 	void setImages();
-	void moveTowardsWaypoint(float deltaTime);
+	void moveTowardsWaypoint(float deltaTime, int currentWave);
 	void changeWaypoints(int mapNbr);
 	void manageAnimation(const float deltaTime);
 	void runAnimation(const float deltaTime, const float timePerFrame, const int imageNumber, const bool linear, IntRect* images);
@@ -66,7 +66,7 @@ private:
 	Waypoint* secondPath = nullptr;
 	const int DEAD_ZONE = 3;
 
-	float speed = 0.9f;
+	float speed = 1.0f;
 	float speedModifier = 1.0f;
 
 	float damageModifier = 1.0f;

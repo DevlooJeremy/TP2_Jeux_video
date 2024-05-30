@@ -61,7 +61,7 @@ void Demon::setImages()
 	setTextureRect(imagesFlying[0]);
 }
 
-void Demon::manageDemon(float deltaTime, int mapNbr)
+void Demon::manageDemon(float deltaTime, int mapNbr, int currentWave)
 {
 	if (!isActive()) return;
 	if (isDying)
@@ -70,17 +70,17 @@ void Demon::manageDemon(float deltaTime, int mapNbr)
 		if (currentImage == NBR_ANIM_IMAGES -1) deactivate();
 		return;
 	}
-	moveTowardsWaypoint(deltaTime);
+	moveTowardsWaypoint(deltaTime, currentWave);
 	manageAnimation(deltaTime);
 	changeWaypoints(mapNbr);
 	manageHealthBar();
 	manageDeath();
 }
 
-void Demon::moveTowardsWaypoint(float deltaTime)
+void Demon::moveTowardsWaypoint(float deltaTime, int currentWave)
 {
 	if (animationState != AnimationState::DEATH) setAnimationState(AnimationState::FLY);
-	float moveSpeed = speed * 60 * speedModifier;
+	float moveSpeed = speed * (54 + (6 * currentWave)) * speedModifier;
 	float angle = atan2f(waypoint->getPosition().y - getPosition().y,waypoint->getPosition().x - getPosition().x);
 	move(cos(angle) * moveSpeed * deltaTime,sin(angle) * moveSpeed * deltaTime);
 }

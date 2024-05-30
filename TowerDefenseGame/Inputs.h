@@ -12,9 +12,11 @@ struct Inputs
 	{
 		mousePosition = Vector2f(0.0f, 0.0f);
 		mouseLeftButtonClicked = false;
+		toggleWapointsClicked = false;
 	}
 
 
 	Vector2f mousePosition;
 	bool mouseLeftButtonClicked;
+	bool toggleWapointsClicked;
 };

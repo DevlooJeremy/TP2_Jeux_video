@@ -93,6 +93,11 @@ void SceneGame::getInputs()
 			{
 				instruction = Instruction::SACRED_LIGHT;
 			}
+
+			if (event.key.scancode == Keyboard::Scan::W)
+			{
+				inputs.toggleWapointsClicked = true;
+			}
 		}
 	}
 }
@@ -102,6 +107,7 @@ void SceneGame::update()
 	manageLeftClick();
 	manageDemon();
 	manageSpells();
+	manageWaypoints();
 }
 
 void SceneGame::draw()
@@ -119,18 +125,21 @@ void SceneGame::draw()
 
 	towers[KING_TOWER_ARRAY_POSITION].draw(renderWindow);
 
-	if (mapNbr == 1)
+	if (showWaypoints) 
 	{
-		for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP; i++)
+		if (mapNbr == 1)
 		{
-			renderWindow.draw(waypoints[i]);
+			for (size_t i = 0; i < NBR_WAYPOINTS_FIRST_MAP; i++)
+			{
+				renderWindow.draw(waypoints[i]);
+			}
 		}
-	}
-	else
-	{
-		for (size_t i = 0; i < NBR_WAYPOINTS; i++)
+		else
 		{
-			renderWindow.draw(waypoints[i]);
+			for (size_t i = 0; i < NBR_WAYPOINTS; i++)
+			{
+				renderWindow.draw(waypoints[i]);
+			}
 		}
 	}
 
@@ -268,7 +277,7 @@ void SceneGame::manageDemon()
 {
 	for (size_t i = 0; i < NBR_DEMON; i++)
 	{
-		demons[i].manageDemon(deltaTime, mapNbr);
+		demons[i].manageDemon(deltaTime, mapNbr, currentWave);
 	}
 	spawnDemon();
 }
@@ -287,6 +296,7 @@ void SceneGame::spawnDemon()
 				if (mapNbr == 1) position = Vector2f(610, -100);
 				else position = Vector2f(-100, 410);
 				demons[i].spawn(position);
+				demonSpawned += 1;
 				break;
 			}
 
@@ -316,5 +326,14 @@ void SceneGame::initTowers() {
 			towers[i].init(Tower::ARCHER_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
 			towers[i + currentMapMaxNbrOfTower].init(Tower::MAGE_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
 		}
+	}
+}
+
+void SceneGame::manageWaypoints()
+{
+	if (inputs.toggleWapointsClicked)
+	{
+		if (showWaypoints) showWaypoints = false;
+		else showWaypoints = true;
 	}
 }
