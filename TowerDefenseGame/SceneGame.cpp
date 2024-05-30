@@ -354,10 +354,13 @@ void SceneGame::initTowers() {
 }
 
 void SceneGame::initProjectiles() {
-	for (int i = 0; i < NBR_TOTAL_MAX_PROJECTILES; i++)
+	for (int i = 0; i < NBR_MAX_TOWER_PROJECTILES; i++)
 	{
 		projectiles[i].init(Projectile::ARROW_SPRITE_NBR);
 		projectiles[i + NBR_MAX_TOWER_PROJECTILES].init(Projectile::BLAST_SPRITE_NBR);
+	}
+	for (int i = 0; i < NBR_MAX_DEMON_PROJECTILES; i++)
+	{
 		projectiles[i + NBR_MAX_TOWER_PROJECTILES * 2].init(Projectile::FIREBALL_SPRITE_NBR);
 	}
 }

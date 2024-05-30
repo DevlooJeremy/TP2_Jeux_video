@@ -25,6 +25,7 @@ public:
 	~Tower();
 	void init(const int spriteNbr, const Vector2f& position);
 	void notify(Subject* subject);
+	void draw(RenderWindow& renderWindow) const override;
 
 	void build();
 	void takeDamage(const int damage);
@@ -43,11 +44,22 @@ private:
 
 	const float KING_MAX_HEALTH = 500;
 	const float MAX_HEALTH = 250;
+	Sprite redHealthBar;
+	Sprite greenHealthBar;
+	void manageHealthBar();
 
 	const int MAGE_RECTANGLE_SIZE = 150;
 	const int MAGE_ATTACK_ANIM = 3;
 	IntRect* imagesMageAttack = nullptr;
+	bool finishedAnimations = true;
+	bool playedAnim = false;
 	void setupMageAnims();
+	void manageMageAnims(float deltaTime);
+	enum AnimationState { IDLE, ATTACK };
+	AnimationState state;
+	int lastRect = 0;
+	const float MAX_DELAY= 0.5;
+	float animStateDelay = 0;
 
 	bool towerBuiltOnPosition = false;
 	bool mouseInBound(const Vector2f mousePosition) const;
