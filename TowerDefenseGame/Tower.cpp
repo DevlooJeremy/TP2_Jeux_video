@@ -23,18 +23,20 @@ void Tower::init(const int spriteNbr, const Vector2f& position) {
 	case KING_TOWER_SPRITE_NBR:
 		setTexture(ContentPipeline::getInstance().getKingTowerTexture());
 		setHealth(KING_MAX_HEALTH);
-		activate();
+		this->activate();
 		break;
 	case ARCHER_TOWER_SPRITE_NBR:
 		setTexture(ContentPipeline::getInstance().getArcherTowerTexture());
 		setHealth(MAX_HEALTH);
 		maxShotCooldown = ARCHER_MAX_SHOT_COOLDOWN;
+		deactivate();
 		break;
 	case MAGE_TOWER_SPRITE_NBR:
 		setTexture(ContentPipeline::getInstance().getMageTowerTexture());
 		setHealth(MAX_HEALTH);
 		maxShotCooldown = MAGE_MAX_SHOT_COOLDOWN;
 		setupMageAnims();
+		deactivate();
 		break;
 
 	default:

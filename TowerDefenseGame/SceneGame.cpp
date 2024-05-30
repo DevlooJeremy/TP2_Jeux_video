@@ -403,6 +403,7 @@ void SceneGame::notify(Subject* subject) {
 		{
 			for (size_t i = 20; i < NBR_TOTAL_MAX_PROJECTILES; i++)
 			{
+				if (projectiles[i].isActive()) continue;
 				projectiles[i].shoot(&towers[demon->getClosestTowerIndex()], demon->getPosition());
 				break;
 			}
@@ -428,4 +429,19 @@ void SceneGame::manageMana()
 	}
 	manaTimer += deltaTime;
 	hud.setMana(mana);
+}
+
+void SceneGame::manageEndWave()
+{
+	bool allDemonDeactivated = true;
+	for (size_t i = 0; i < NBR_DEMON; i++)
+	{
+		if (demons[i].isActive()) allDemonDeactivated = false;
+	}
+	if (demonSpawned == 50 && allDemonDeactivated) 
+	{
+		if (currentWave == 10) transitionToScene = Scene::END;
+		else transitionToScene = Scene::TRANSITION;
+		isRunning = false;
+	}
 }

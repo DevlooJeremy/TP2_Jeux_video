@@ -259,6 +259,7 @@ void Demon::shoot(GameObject towers[], int nbrTowers, float deltaTime)
 		bool towerInRange = false;
 		for (int i = 0; i < nbrTowers; i++)
 		{
+			if (!towers[i].isActive()) continue;
 			float distanceX = abs(towers[i].getPosition().x - getPosition().x);
 			float distanceY = abs(towers[i].getPosition().y - getPosition().y);
 

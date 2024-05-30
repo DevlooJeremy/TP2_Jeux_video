@@ -77,6 +77,12 @@ int Game::run()
 				currentWave++;
 			}
 
+			SceneGame* tempSceneGame = dynamic_cast<SceneGame*>(activeScene);
+			if (tempSceneGame != nullptr)
+			{
+				currentWave++;
+			}
+
 			//À la fin d'une scène, s'il y a des sauvegardes à faire
 			//C'est possible de les faire là.
 			/*SceneGame* tempScene = dynamic_cast<SceneGame*>(activeScene);
