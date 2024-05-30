@@ -65,6 +65,8 @@ private:
 
 	void initTowers();
 
+	void manageMana();
+
 	View view;
 	Hud hud;
 	Inputs inputs;
@@ -87,6 +89,9 @@ private:
 	Spell spells[2];
 	bool sacredLightCasted = false;
 	bool plagueCasted = false;
+
+	int mana = 500;
+	float manaTimer = 0.0f;
 
 
 	Sprite map;

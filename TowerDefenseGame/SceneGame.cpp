@@ -108,6 +108,7 @@ void SceneGame::update()
 	manageDemon();
 	manageSpells();
 	manageWaypoints();
+	manageMana();
 }
 
 void SceneGame::draw()
@@ -336,4 +337,15 @@ void SceneGame::manageWaypoints()
 		if (showWaypoints) showWaypoints = false;
 		else showWaypoints = true;
 	}
+}
+
+void SceneGame::manageMana()
+{
+	if (manaTimer >= 0.2)
+	{
+		mana += 1;
+		manaTimer = 0.0f;
+	}
+	manaTimer += deltaTime;
+	hud.setMana(mana);
 }

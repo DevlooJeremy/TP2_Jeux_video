@@ -12,6 +12,7 @@ public:
 	Hud() {}
 	void hudInit(const Texture& hudMaskTexture, const Font& font);
 	void draw(sf::RenderWindow& renderWindow);
+	void setMana(const int mana);
 
 
 private:

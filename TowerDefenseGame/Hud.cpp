@@ -60,3 +60,8 @@ void Hud::draw(sf::RenderWindow& renderWindow)
 	for (int i = 0; i < INSTRUCTIONS_NUMBER; i++)
 		renderWindow.draw(instructionTexts[i]);
 }
+
+void Hud::setMana(const int mana)
+{
+	this->manaText.setString("Mana - " + std::to_string(mana));
+}
