@@ -2,6 +2,7 @@
 #include "ContentPipeline.h"
 #include "SceneGame.h"
 #include "TowerEmplacement.h"
+#include <iostream>
 
 Tower::Tower()
 {
@@ -27,10 +28,12 @@ void Tower::init(const int spriteNbr, const Vector2f& position) {
 	case ARCHER_TOWER_SPRITE_NBR:
 		setTexture(ContentPipeline::getInstance().getArcherTowerTexture());
 		setHealth(MAX_HEALTH);
+		maxShotCooldown = ARCHER_MAX_SHOT_COOLDOWN;
 		break;
 	case MAGE_TOWER_SPRITE_NBR:
 		setTexture(ContentPipeline::getInstance().getMageTowerTexture());
 		setHealth(MAX_HEALTH);
+		maxShotCooldown = MAGE_MAX_SHOT_COOLDOWN;
 		setupMageAnims();
 		break;
 
@@ -55,6 +58,7 @@ void Tower::setupMageAnims() {
 
 	setTextureRect(imagesMageAttack[0]);
 	setOrigin(MAGE_RECTANGLE_SIZE / 2, MAGE_RECTANGLE_SIZE / 2);
+	collisionCircle.setRadius(MAGE_RECTANGLE_SIZE / 2);
 }
 
 void Tower::notify(Subject* subject) {
@@ -96,11 +100,6 @@ void Tower::notify(Subject* subject) {
 	}
 }
 
-void Tower::build() {
-	setHealth(MAX_HEALTH);
-	activate();
-}
-
 bool Tower::mouseInBound(const Vector2f mousePosition) const {
 	FloatRect bounds = getGlobalBounds();
 	if (mousePosition.x >= bounds.left && mousePosition.x <= bounds.left+bounds.width &&
@@ -109,4 +108,62 @@ bool Tower::mouseInBound(const Vector2f mousePosition) const {
 		return true;
 	}
 	return false;
+}
+
+void Tower::build() {
+	setHealth(MAX_HEALTH);
+	activate();
+}
+
+void Tower::takeDamage(const int damage) {
+	this->damage(damage);
+	if (getHealth() <= 0)
+	{
+		deactivate();
+		notifyAllObservers();
+	}
+}
+
+void Tower::shoot(const Demon demons[], const int nbrOfDemons, const float deltaTime) {
+	if (isActive() && shotCooldown <= 0)
+	{
+		float lastChosenDemonDistance = RANGE + 1;
+		bool demonInRange = false;
+		for (int i = 0; i < nbrOfDemons; i++)
+		{
+			float distanceX = abs(demons[i].getPosition().x - getPosition().x);
+			float distanceY = abs(demons[i].getPosition().y - getPosition().y);
+
+			float distance = sqrtf(distanceX * distanceX + distanceY * distanceY);
+			if (distance <= RANGE && distance <= lastChosenDemonDistance)
+			{
+				lastChosenDemonDistance = distance;
+				closestDemonIndex = i;
+				demonInRange = true;
+			}
+		}
+		if (demonInRange)
+		{
+			shotCooldown = maxShotCooldown;
+			shooting = true;
+			notifyAllObservers();
+			shooting = false;
+		}
+	}
+	else if (shotCooldown > 0)
+	{
+		shotCooldown -= deltaTime;
+	}
+}
+
+bool Tower::isShooting() const {
+	return shooting;
+}
+
+int Tower::getClosestDemonIndex() const {
+	return closestDemonIndex;
+}
+
+int Tower::getTowerType() const {
+	return spriteNbr;
 }

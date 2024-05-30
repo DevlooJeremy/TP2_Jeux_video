@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "Subject.h"
+#include "IObserver.h"
 #include "Hud.h"
 #include "Inputs.h"
 #include "TowerEmplacement.h"
@@ -8,6 +9,7 @@
 #include "Waypoint.h"
 #include "Demon.h"
 #include "Spell.h"
+#include "Projectile.h"
 
 /*
 Metrics de sceneGame OU du level 1 (à effacer à la fin)
@@ -35,34 +37,38 @@ Metrics de du level 2 (à effacer à la fin)
 - Le reste est identique à la scène 1
 */
 
-class SceneGame : public Scene, public Subject
+class SceneGame : public Scene, public IObserver, public Subject
 {
 public:
 	SceneGame(RenderWindow& renderWindow, Event& event, int currentWave);
 	scenes run() override;
 	bool init() override;
+	void notify(Subject* subject);
 
 	static enum Instruction {ARCHER_TOWER, MAGE_TOWER, PLAGUE, SACRED_LIGHT, NO_SELECTION};
 	Instruction getInstruction() const;
 	Vector2f getMousePosition() const;
+
+	static const int NBR_DEMON = 20;
 private:
 	void getInputs() override;
 	void update() override;
 	void draw() override;
 	bool unload() override;
 
-	void manageLeftClick();
-	void manageArcherPlacement();
-	void manageMagePlacement();
-	void managePlagePlacement();
-	void manageSacredLightPlacement();
-	void manageSpells();
-
 	void setupWaypoints();
 	void manageDemon();
 	void spawnDemon();
 
 	void initTowers();
+	void initProjectiles();
+	
+	void manageLeftClick();
+	void managePlagePlacement();
+	void manageSacredLightPlacement();
+	void manageSpells();
+	void manageTowers();
+	void manageProjectiles();
 
 	View view;
 	Hud hud;
@@ -73,7 +79,6 @@ private:
 	const int NBR_WAYPOINTS = 11;
 	Waypoint waypoints[11];
 
-	const int NBR_DEMON = 20;
 	Demon demons[20];
 	float spawnTimer = 0.0f;
 
@@ -82,18 +87,22 @@ private:
 	bool sacredLightCasted = false;
 	bool plagueCasted = false;
 
-
 	Sprite map;
-
 	int mapNbr;
 
 	static const int NBR_MAX_TOWER = 9;
 	int currentMapMaxNbrOfTower;
-	const int KING_TOWER_ARRAY_POSITION = NBR_MAX_TOWER * 2;
+	static const int NBR_TYPE_OF_ATTACK_TOWER = 2;
+	const int KING_TOWER_ARRAY_POSITION = NBR_MAX_TOWER * NBR_TYPE_OF_ATTACK_TOWER;
 	const Vector2f KING_TOWER_POSITION_MAP1 = Vector2f(1138, 600);
 	const Vector2f KING_TOWER_POSITION_MAP2 = Vector2f(1138, 564);
 	const Vector2f TOWER_EMPLACEMENTS_MAP1[NBR_MAX_TOWER] = { Vector2f(470, 170), Vector2f(770, 250), Vector2f(440, 370), Vector2f(650, 520), Vector2f(120, 650), Vector2f(470, 700), Vector2f(850, 710), Vector2f(660, 950) };
 	const Vector2f TOWER_EMPLACEMENTS_MAP2[NBR_MAX_TOWER] = { Vector2f(110, 620), Vector2f(228, 320), Vector2f(444, 780), Vector2f(362, 530), Vector2f(610, 222), Vector2f(998, 270), Vector2f(630, 460), Vector2f(935, 520), Vector2f(798, 760) };
 	TowerEmplacement emplacements[NBR_MAX_TOWER];
-	Tower towers[NBR_MAX_TOWER*2 + 1];
+	Tower towers[NBR_MAX_TOWER * NBR_TYPE_OF_ATTACK_TOWER + 1];
+
+	static const int NBR_MAX_TOWER_PROJECTILES = 10;
+	static const int NBR_MAX_DEMON_PROJECTILES = 20;
+	static const int NBR_TOTAL_MAX_PROJECTILES = NBR_MAX_TOWER_PROJECTILES * NBR_TYPE_OF_ATTACK_TOWER + NBR_MAX_DEMON_PROJECTILES;
+	Projectile projectiles[NBR_TOTAL_MAX_PROJECTILES];
 };

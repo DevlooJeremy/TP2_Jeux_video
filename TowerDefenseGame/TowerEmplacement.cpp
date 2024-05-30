@@ -1,6 +1,7 @@
 #include "TowerEmplacement.h"
 #include "ContentPipeline.h"
 #include "SceneGame.h"
+#include "Tower.h"
 
 TowerEmplacement::TowerEmplacement()
 {
@@ -20,6 +21,17 @@ void TowerEmplacement::notify(Subject* subject) {
 		{
 			SceneGame* game = static_cast<SceneGame*>(subject);
 			if (mouseInBound(game->getMousePosition()) && (game->getInstruction() == SceneGame::ARCHER_TOWER || game->getInstruction() == SceneGame::MAGE_TOWER))
+			{
+				deactivate();
+			}
+		}
+	}
+	else if (typeid(*subject) == typeid(Tower))
+	{
+		if (!isActive())
+		{
+			Tower* tower = static_cast<Tower*>(subject);
+			if (!tower->isActive() && tower->getPosition() == getPosition())
 			{
 				deactivate();
 			}

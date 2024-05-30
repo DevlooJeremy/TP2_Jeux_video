@@ -1,12 +1,12 @@
 #include "SceneGame.h"
 #include "ContentPipeline.h"
-#include "Subject.h"
 #include <iostream>
 
 SceneGame::SceneGame(RenderWindow& renderWindow, Event& event, int currentWave) : Scene(renderWindow, event)
 {
 	view = renderWindow.getDefaultView();
 	this->currentWave = currentWave;
+	Subject::addObserver(this);
 }
 
 Scene::scenes SceneGame::run()
@@ -46,6 +46,7 @@ bool SceneGame::init()
 
 
 	initTowers();
+	initProjectiles();
 
 	return true;
 }
@@ -98,6 +99,8 @@ void SceneGame::update()
 	manageLeftClick();
 	manageDemon();
 	manageSpells();
+	manageTowers();
+	manageProjectiles();
 }
 
 void SceneGame::draw()
@@ -129,6 +132,12 @@ void SceneGame::draw()
 	{
 		demons[i].draw(renderWindow);
 	}
+
+	for (int i = 0; i < NBR_TOTAL_MAX_PROJECTILES; i++)
+	{
+		projectiles[i].draw(renderWindow);
+	}
+
 	hud.draw(renderWindow);
 	renderWindow.display();
 
@@ -201,6 +210,20 @@ void SceneGame::manageSpells()
 	}
 }
 
+void SceneGame::manageTowers() {
+	for (int i = 0; i < currentMapMaxNbrOfTower*2; i++)
+	{
+		towers[i].shoot(demons, NBR_DEMON, deltaTime);
+	}
+}
+
+void SceneGame::manageProjectiles() {
+	for (int i = 0; i < NBR_MAX_TOWER_PROJECTILES*2; i++)
+	{
+		projectiles[i].follow(deltaTime);
+	}
+}
+
 void SceneGame::setupWaypoints() 
 {
 	waypoints[0].setPosition(610, 8);
@@ -269,6 +292,42 @@ void SceneGame::initTowers() {
 			emplacements[i].init(TOWER_EMPLACEMENTS_MAP2[i]);
 			towers[i].init(Tower::ARCHER_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
 			towers[i + currentMapMaxNbrOfTower].init(Tower::MAGE_TOWER_SPRITE_NBR, TOWER_EMPLACEMENTS_MAP2[i]);
+		}
+	}
+}
+
+void SceneGame::initProjectiles() {
+	for (int i = 0; i < NBR_TOTAL_MAX_PROJECTILES; i++)
+	{
+		projectiles[i].init(Projectile::ARROW_SPRITE_NBR);
+		projectiles[i + NBR_MAX_TOWER_PROJECTILES].init(Projectile::BLAST_SPRITE_NBR);
+		projectiles[i + NBR_MAX_TOWER_PROJECTILES * 2].init(Projectile::FIREBALL_SPRITE_NBR);
+	}
+}
+
+void SceneGame::notify(Subject* subject) {
+	if (typeid(*subject) == typeid(Tower))
+	{
+		Tower* tower = static_cast<Tower*>(subject);
+		if (tower->isShooting())
+		{
+			int indexMultiplier = 0;
+			switch (tower->getTowerType())
+			{
+			case Tower::MAGE_TOWER_SPRITE_NBR:
+				indexMultiplier = 1;
+				break;
+			}
+
+			for (int i = 0; i < NBR_MAX_TOWER_PROJECTILES; i++)
+			{
+				int index = i + NBR_MAX_TOWER_PROJECTILES * indexMultiplier;
+				if (!projectiles[index].isActive())
+				{
+					projectiles[index].shoot(&demons[tower->getClosestDemonIndex()], tower->getPosition());
+					break;
+				}
+			}
 		}
 	}
 }
